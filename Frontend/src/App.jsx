@@ -1,11 +1,15 @@
-function App() {
- 
+import {RouterProvider} from "react-router";
+import {router} from "./app.routes";
+import {AuthProvider} from "./features/auth/auth.context";
 
+
+function App() {
   return (
-    
-      <h1>Resume Builder</h1>
-    
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   )
 }
+
 
 export default App
