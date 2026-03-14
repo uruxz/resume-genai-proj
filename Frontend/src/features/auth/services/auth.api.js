@@ -61,7 +61,8 @@ export async function getMe() {
         return response.data
 
     } catch (err) {
-        console.log(err)
+        console.error("getMe error:", err.response?.status, err.response?.data?.message || err.message)
+        throw err
     }
 
 }

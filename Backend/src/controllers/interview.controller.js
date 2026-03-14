@@ -11,7 +11,9 @@ const interviewReportModel = require("../models/interviewReport.model")
 async function generateInterViewReportController(req, res) {
 
     const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
-    const { selfDescription, jobDescription } = req.body
+    const { selfDescription, jobDescription, title} = req.body
+
+    console.log(req.body);
 
     const interViewReportByAi = await generateInterviewReport({
         resume: resumeContent.text,
@@ -24,6 +26,7 @@ async function generateInterViewReportController(req, res) {
         resume: resumeContent.text,
         selfDescription,
         jobDescription,
+        title,
         ...interViewReportByAi
     })
 

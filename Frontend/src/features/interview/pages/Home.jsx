@@ -8,13 +8,14 @@ const Home = () => {
     const { loading, generateReport,reports } = useInterview()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
+    const [ title, setTitle ] = useState("")
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
 
     const handleGenerateReport = async () => {
         const resumeFile = resumeInputRef.current.files[ 0 ]
-        const data = await generateReport({ jobDescription, selfDescription, resumeFile })
+        const data = await generateReport({ jobDescription, selfDescription, resumeFile, title })
         navigate(`/interview/${data._id}`)
     }
 
@@ -67,6 +68,18 @@ const Home = () => {
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                             </span>
                             <h2>Your Profile</h2>
+                        </div>
+
+                        {/* Job Title */}
+                        <div className='input-field'>
+                            <label className='section-label'>Job Title</label>
+                            <input
+                                type='text'
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder='e.g. Senior Frontend Engineer, Product Manager...'
+                                className='panel__input'
+                            />
                         </div>
 
                         {/* Upload Resume */}
