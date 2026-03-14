@@ -61,7 +61,10 @@ export async function getMe() {
         return response.data
 
     } catch (err) {
-        console.error("getMe error:", err.response?.status, err.response?.data?.message || err.message)
+        // 401 is expected when user is not logged in, don't log to console
+        if (err.response?.status !== 401) {
+            console.error("getMe error:", err.response?.status, err.response?.data?.message || err.message)
+        }
         throw err
     }
 

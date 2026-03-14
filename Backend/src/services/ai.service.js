@@ -152,15 +152,31 @@ CRITICAL REQUIREMENTS:
 async function generatePdfFromHtml(htmlContent) {
     const browser = await puppeteer.launch()
     const page = await browser.newPage();
+    
+    // Set viewport to A4 dimensions
+    await page.setViewport({ width: 794, height: 1123 })
+    
     await page.setContent(htmlContent, { waitUntil: "networkidle0" })
 
+    // Get page dimensions to scale to fit 1 page
+    const { width, height } = await page.evaluate(() => ({
+        width: document.documentElement.scrollWidth,
+        height: document.documentElement.scrollHeight
+    }))
+    
+    // Scale down to fit on 1 page, but don't scale up
+    const scale = Math.min(794 / width, 1123 / height, 1)
+
     const pdfBuffer = await page.pdf({
-        format: "A4", margin: {
-            top: "20mm",
-            bottom: "20mm",
-            left: "15mm",
-            right: "15mm"
-        }
+        format: "A4",
+        scale: scale,
+        margin: {
+            top: "8mm",
+            bottom: "8mm",
+            left: "8mm",
+            right: "8mm"
+        },
+        printBackground: true
     })
 
     await browser.close()
@@ -174,19 +190,172 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
             html: z.string().describe("The HTML content of the resume which can be converted to PDF using any library like puppeteer")
         })
 
-        const prompt = `Generate a professional resume in HTML format for a candidate with the following details:
+        const prompt = `You are an expert resume writer specializing in ATS-optimized resumes. Create a professional, STRICTLY ONE-PAGE resume in HTML format.
 
-Resume: ${resume}
+CANDIDATE INFORMATION:
+Current Resume/Experience:
+${resume}
 
-Self Description: ${selfDescription}
+Self Description:
+${selfDescription}
 
-Job Description: ${jobDescription}
+TARGET JOB:
+${jobDescription}
 
-The response should be a JSON object with a single field "html" containing HTML content that can be converted to PDF.
-The resume should be tailored for the given job description, highlight strengths and relevant experience.
-The HTML should be well-formatted, visually appealing, ATS-friendly, and ideally 1-2 pages long when converted to PDF.
-Focus on quality rather than quantity and include all relevant information to increase interview chances.
-The content should read like a human-written resume, not AI-generated.`
+CRITICAL REQUIREMENTS FOR THE RESUME:
+1. STRICTLY MUST FIT ON ONE PAGE (A4 format)
+2. ATS-FRIENDLY: Use clear structure, standard fonts (Arial, Calibri, or similar), proper semantic HTML
+3. NO FANCY GRAPHICS: Only text and basic HTML formatting
+4. HUMAN-WRITTEN STYLE: Reads naturally, not AI-generated sounding
+5. JOB-TAILORED: Keywords from job description prioritized
+6. CONTACT INFO: Include email (use placeholder if needed)
+7. SECTIONS: Contact | Summary | Experience | Skills | Education (only essential)
+
+ATS OPTIMIZATION RULES:
+- Use HTML semantic tags (h1, h2, p, ul, li, div)
+- No tables, no images, no decorative elements
+- Simple headings and bullet points only
+- Clear hierarchy: Name (largest), Sections (bold underline), Content (regular)
+- Keywords naturally integrated into experience and summary
+- Bullet points with action verbs (Developed, Implemented, Designed, Increased, Optimized, Built, Created, Led)
+- Professional spacing: Tight but readable, no large gaps between sections
+- Fills entire A4 page using all available space effectively
+- No excessive padding or margins in content
+- Use bullet point character (•) between skills for compact display
+
+CONTENT GUIDELINES:
+- Summary: 2-3 sentences maximum, focused on role match, no filler
+- Experience: Show 2-3 most relevant positions, bullets are concise (1-2 lines), front-load achievements
+- Skills: 10-15 most relevant technical skills separated by bullet points (•)
+- Education: Degree, School, Graduation year only
+- IMPORTANT: Fill the entire page - use all available space with content, minimize gaps
+- Keep line heights tight (1.2-1.3) for professional compact look
+- Use bullet points (•) between skills, not commas
+- Abbreviate where professional (e.g., "Grad: 2023" vs "Graduated: 2023")
+- Remove ALL unnecessary margins/padding - the template handles uniform spacing
+- NO: Fancy fonts, colors (except black text), icons, graphics, or decorative elements
+
+
+PERFECT RESUME STRUCTURE (HTML):
+<html>
+<head>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.3;
+  font-size: 10px;
+  margin: 0;
+  padding: 0.4in;
+  color: #000;
+}
+h1 {
+  margin: 0 0 2px 0;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+.contact {
+  text-align: center;
+  margin: 0 0 4px 0;
+  font-size: 9px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 4px;
+}
+h2 {
+  margin: 4px 0 2px 0;
+  font-size: 11px;
+  font-weight: bold;
+  border-bottom: 1px solid #000;
+  padding-bottom: 1px;
+}
+.section {
+  margin: 0 0 5px 0;
+}
+.job {
+  margin: 3px 0 1px 0;
+}
+.job-title {
+  margin: 0;
+  font-weight: bold;
+  font-size: 10px;
+}
+.job-details {
+  margin: 0;
+  font-size: 9px;
+  color: #333;
+}
+ul {
+  margin: 2px 0 0 0;
+  padding-left: 15px;
+}
+ul li {
+  margin: 0 0 2px 0;
+  padding: 0;
+  font-size: 10px;
+  line-height: 1.25;
+}
+.skills-list {
+  margin: 2px 0 0 0;
+  font-size: 10px;
+  line-height: 1.3;
+}
+.education {
+  margin: 2px 0 0 0;
+  font-size: 10px;
+}
+</style>
+</head>
+<body>
+  <h1>[Full Name]</h1>
+  <div class="contact">[Email] | [Phone] | [City, State]</div>
+
+  <h2>PROFESSIONAL SUMMARY</h2>
+  <div class="section">
+    <p style="margin: 2px 0;">[2-3 sentence summary directly matching target role keywords]</p>
+  </div>
+
+  <h2>PROFESSIONAL EXPERIENCE</h2>
+  <div class="section">
+    <div class="job">
+      <p class="job-title">[Job Title] | [Company Name]</p>
+      <p class="job-details">[Month Year] – [Month Year]</p>
+      <ul>
+        <li>Accomplished achievement with quantifiable metrics/results aligned with role</li>
+        <li>Implemented key responsibility demonstrating target skill from job description</li>
+        <li>Improved or optimized process/system showing impact</li>
+      </ul>
+    </div>
+    <div class="job">
+      <p class="job-title">[Previous Job Title] | [Company Name]</p>
+      <p class="job-details">[Month Year] – [Month Year]</p>
+      <ul>
+        <li>Led initiative or project with clear deliverable and impact</li>
+        <li>Developed solution addressing key requirement from job description</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>SKILLS</h2>
+  <div class="skills-list">[Skill1] • [Skill2] • [Skill3] • [Skill4] • [Skill5] • [Skill6] • [Skill7] • [Skill8] • [Skill9] • [Skill10]</div>
+
+  <h2>EDUCATION</h2>
+  <div class="education">[Degree Type] in [Major] | [University Name] | [Graduation Year]</div>
+</body>
+</html>
+
+IMPORTANT:
+- Use MINIMAL styling - only font-size, margin, padding, border-bottom
+- NO colors, backgrounds, or decorations
+- Ensure text fits in one A4 page
+- Action verbs: Developed, Implemented, Designed, Led, Managed, Improved, Optimized, Built, Created, etc.
+- Include specific technologies/tools from job description
+- Quantify achievements where possible
+- Write as if from candidate's perspective
+
+Generate ONLY the HTML code, valid JSON format:
+{
+  "html": "<html>...</html>"
+}`;
 
         console.log("[AI Service] Calling Gemini API for resume PDF...");
         const response = await ai.models.generateContent({
@@ -219,7 +388,7 @@ The content should read like a human-written resume, not AI-generated.`
         console.log("[AI Service] Successfully parsed resume HTML");
 
         const pdfBuffer = await generatePdfFromHtml(jsonContent.html);
-        console.log("[AI Service] Successfully generated resume PDF");
+        console.log("[AI Service] Successfully generated resume PDF - 1 page");
 
         return pdfBuffer;
     } catch (error) {

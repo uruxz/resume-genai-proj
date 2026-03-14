@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
+import { useAuth } from '../../../features/auth/hooks/useAuth'
 import { useNavigate } from 'react-router'
 
 const Home = () => {
 
     const { loading, generateReport,reports } = useInterview()
+    const { handleLogout, user } = useAuth()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
     const [ title, setTitle ] = useState("")
@@ -19,6 +21,11 @@ const Home = () => {
         navigate(`/interview/${data._id}`)
     }
 
+    const handleLogoutClick = async () => {
+        await handleLogout()
+        navigate('/login')
+    }
+
     if (loading) {
         return (
             <main className='loading-screen'>
@@ -29,6 +36,20 @@ const Home = () => {
 
     return (
         <div className='home-page'>
+
+            {/* Top Navigation Bar */}
+            <div className='home-navbar'>
+                <div className='navbar-content'>
+                    <h3 className='navbar-brand'>AI Interview Coach</h3>
+                    <div className='navbar-actions'>
+                        {user && <span className='navbar-user'>{user.username}</span>}
+                        <button onClick={handleLogoutClick} className='navbar-button logout-button'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             {/* Page Header */}
             <header className='page-header'>

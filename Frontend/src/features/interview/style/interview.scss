@@ -18,6 +18,94 @@ $severity-low: #52c764;
     display: none;
 }
 
+// ── Navigation Bar ────────────────────────────────────────────────────────────
+.interview-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba($bg-card, 0.95);
+    border-bottom: 1px solid $border-color;
+    backdrop-filter: blur(10px);
+    z-index: 100;
+
+    .navbar-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        max-width: 100%;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .navbar-back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: transparent;
+        border: 1px solid $border-color;
+        border-radius: 0.375rem;
+        color: $text-primary;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $accent;
+            color: $accent;
+        }
+    }
+
+    .navbar-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0;
+        flex: 1;
+        text-align: center;
+    }
+
+    .navbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .navbar-user {
+        font-size: 0.9rem;
+        color: $text-muted;
+    }
+
+    .navbar-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: transparent;
+        border: 1px solid $border-color;
+        border-radius: 0.375rem;
+        color: $text-primary;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $accent;
+            color: $accent;
+        }
+
+        &.logout-button {
+            &:hover {
+                background-color: rgba($accent, 0.1);
+            }
+        }
+    }
+}
+
 // ── Page Shell ────────────────────────────────────────────────────────────────
 .interview-page {
     width: 100%;
@@ -26,8 +114,9 @@ $severity-low: #52c764;
     color: $text-primary;
     font-family: $font-stack;
     display: flex;
+    flex-direction: column;
     align-items: stretch;
-    padding: 1.5rem;
+    padding-top: 70px;
     box-sizing: border-box;
 }
 
@@ -35,12 +124,14 @@ $severity-low: #52c764;
 .interview-layout {
     display: flex;
     width: 100%;
-    max-width: 1280px;
+    max-width: 100%;
     margin: 0 auto;
     background-color: $bg-card;
     border: 1px solid $border-color;
     border-radius: 1rem;
     justify-content: space-between;
+    padding: 1.5rem;
+    box-sizing: border-box;
 }
 
 .interview-divider {
