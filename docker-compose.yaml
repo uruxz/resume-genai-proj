@@ -1,0 +1,35 @@
+services:
+  frontend:
+    build: ./Frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - dev
+
+  backend:
+    build: ./Backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - dev
+
+  db:      
+    image: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - dev
+    volumes:
+      - mongo-data:/data/db
+
+networks:          
+  dev:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local  
